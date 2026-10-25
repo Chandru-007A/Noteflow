@@ -728,57 +728,67 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
 
       {/* Editor Modal (Create / Edit) */}
       <Dialog open={editorOpen} onOpenChange={setEditorOpen}>
-        <DialogContent className="max-w-2xl rounded-3xl">
+        <DialogContent className="max-w-2xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit note" : "Create a new note"}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+              {editing ? "Edit note" : "Create a new note"}
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400">
               Capture an idea, add tags, and sync it to your cloud workspace.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-5 py-2">
             <div>
-              <Label htmlFor="note-title">Title</Label>
+              <Label htmlFor="note-title" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Title
+              </Label>
               <Input
                 id="note-title"
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Give your note a clear title"
-                className="mt-2"
+                className="mt-2 bg-slate-50 dark:bg-slate-800/90 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400"
                 autoFocus
               />
             </div>
             <div>
-              <Label htmlFor="note-content">Content</Label>
+              <Label htmlFor="note-content" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Content
+              </Label>
               <Textarea
                 id="note-content"
                 value={draft.content}
                 onChange={(e) => setDraft({ ...draft, content: e.target.value })}
                 placeholder="Start writing..."
-                className="mt-2 min-h-48 resize-y leading-7"
+                className="mt-2 min-h-48 resize-y leading-7 bg-slate-50 dark:bg-slate-800/90 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="note-tags">Tags</Label>
+                <Label htmlFor="note-tags" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Tags
+                </Label>
                 <Input
                   id="note-tags"
                   value={draft.tags}
                   onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
                   placeholder="ideas, work, personal"
-                  className="mt-2"
+                  className="mt-2 bg-slate-50 dark:bg-slate-800/90 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400"
                 />
                 <p className="mt-1 text-xs text-slate-500">Separate tags with commas.</p>
               </div>
               <div>
-                <Label>Note accent</Label>
+                <Label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Note accent
+                </Label>
                 <Select
                   value={draft.color}
                   onValueChange={(color) => setDraft({ ...draft, color })}
                 >
-                  <SelectTrigger className="mt-2">
+                  <SelectTrigger className="mt-2 bg-slate-50 dark:bg-slate-800/90 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                     {Object.keys(colorClasses).map((color) => (
                       <SelectItem key={color} value={color}>
                         {color[0].toUpperCase() + color.slice(1)}
@@ -811,7 +821,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
         open={Boolean(noteToDelete)}
         onOpenChange={(open) => !open && setNoteToDelete(null)}
       >
-        <AlertDialogContent className="rounded-3xl">
+        <AlertDialogContent className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Permanently delete this note?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -836,7 +846,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
 
       {/* Full Note View Modal */}
       <Dialog open={Boolean(viewingNote)} onOpenChange={(open) => !open && setViewingNote(null)}>
-        <DialogContent className="max-w-2xl rounded-3xl max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-2xl rounded-3xl max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
           <DialogHeader>
             <div className="flex items-center gap-2">
               {viewingNote?.pinned && <Pin className="size-4 text-violet-500 shrink-0" />}
