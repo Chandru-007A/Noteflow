@@ -1,5 +1,6 @@
 import type React from "react"
 import { Poppins, JetBrains_Mono, Inter } from "next/font/google"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const poppins = Poppins({
@@ -28,7 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${poppins.variable} ${jetbrainsMono.variable} ${inter.variable}`}>
-      <body className={poppins.className}>{children}</body>
+      <body className={poppins.className}>
+        {children}
+        <Toaster richColors position="top-right" closeButton />
+      </body>
     </html>
   )
 }

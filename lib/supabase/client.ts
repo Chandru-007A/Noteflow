@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr"
+import type { User } from "@supabase/supabase-js"
 import type { Database } from "./types"
 
 /**
@@ -20,27 +21,49 @@ export function createClient() {
   return createBrowserClient<Database>(getSupabaseUrl(), getSupabaseKey())
 }
 
+// In-flight singleton promise to prevent duplicate anonymous session creation
+let sessionInitPromise: Promise<User | null> | null = null
+
 /**
  * Ensures that an authenticated session exists for the user.
  * If no session is present, signs in anonymously using Supabase Anonymous Auth.
  * Returns the verified user object, or null if session establishment fails.
+ * Coordinated as a singleton promise across concurrent callers.
  */
-export async function ensureAnonymousSession() {
-  const supabase = createClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (user && !userError) {
-    return user
+export async function ensureAnonymousSession(): Promise<User | null> {
+  if (sessionInitPromise) {
+    return sessionInitPromise
   }
 
-  const { data, error } = await supabase.auth.signInAnonymously()
-  if (error) {
-    console.error("Failed to establish anonymous session:", error.message)
-    return null
-  }
+  sessionInitPromise = (async () => {
+    try {
+      const supabase = createClient()
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
 
-  return data.user
+      if (user && !userError) {
+        return user
+      }
+
+      const { data, error } = await supabase.auth.signInAnonymously()
+      if (error) {
+        console.error("[Auth] Failed to establish anonymous session:", error.message)
+        return null
+      }
+
+      return data.user
+    } catch (err) {
+      console.error("[Auth] Unexpected error during session initialization:", err)
+      return null
+    } finally {
+      // Clear in-flight promise after a brief interval so subsequent explicit calls can re-validate
+      setTimeout(() => {
+        sessionInitPromise = null
+      }, 500)
+    }
+  })()
+
+  return sessionInitPromise
 }
