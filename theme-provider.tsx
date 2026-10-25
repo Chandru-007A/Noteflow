@@ -19,8 +19,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("taskflow-theme") as Theme
-    const savedDarkMode = localStorage.getItem("taskflow-dark-mode") === "true"
+    const savedTheme = (localStorage.getItem("noteflow-theme") || localStorage.getItem("taskflow-theme")) as Theme
+    const savedDarkMode = (localStorage.getItem("noteflow-dark-mode") || localStorage.getItem("taskflow-dark-mode")) === "true"
     if (savedTheme) setTheme(savedTheme)
     setDarkMode(savedDarkMode)
 
@@ -29,8 +29,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("taskflow-theme", theme)
-    localStorage.setItem("taskflow-dark-mode", darkMode.toString())
+    localStorage.setItem("noteflow-theme", theme)
+    localStorage.setItem("noteflow-dark-mode", darkMode.toString())
 
     // Update document class
     document.documentElement.className = `theme-${theme} ${darkMode ? "dark" : ""}`

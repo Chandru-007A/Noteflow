@@ -32,7 +32,7 @@ export function Testimonials() {
       role: "Product Manager",
       avatar: "/placeholder.svg?height=40&width=40",
       content:
-        "TaskFlow has completely transformed how I manage my daily workflow. The nature theme keeps me calm and focused.",
+        "NoteFlow has completely transformed how I capture and organize thoughts. The interface keeps me calm and focused.",
       rating: 5,
     },
     {
@@ -40,14 +40,14 @@ export function Testimonials() {
       role: "Software Developer",
       avatar: "/placeholder.svg?height=40&width=40",
       content:
-        "As a developer, I love the programming theme. The code-inspired interface makes task management feel natural.",
+        "As a developer, I love the clean typography and instant search. The code-inspired design makes note taking feel natural.",
       rating: 5,
     },
     {
       name: "Emily & James",
-      role: "Couple",
+      role: "Writers",
       avatar: "/placeholder.svg?height=40&width=40",
-      content: "The love theme is perfect for us! We can organize our shared goals and dreams together beautifully.",
+      content: "NoteFlow is perfect for organizing ideas and drafts together seamlessly.",
       rating: 5,
     },
   ]
@@ -60,7 +60,7 @@ export function Testimonials() {
             What Our Users Say
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Join thousands of satisfied users who have transformed their productivity with TaskFlow.
+            Join thousands of satisfied users who have transformed their note-taking with NoteFlow.
           </p>
         </div>
 
@@ -222,7 +222,7 @@ export function Newsletter() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900 dark:text-white">
-            Stay Updated with TaskFlow
+            Stay Updated with NoteFlow
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-400 mb-8">
             Get the latest productivity tips, feature updates, and exclusive content delivered to your inbox.

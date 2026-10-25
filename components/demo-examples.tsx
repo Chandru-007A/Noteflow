@@ -246,7 +246,7 @@ export function DemoExamples({ isOpen, onClose }: DemoExamplesProps) {
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
               <Play className="w-6 h-6" />
-              TaskFlow Demo
+              NoteFlow Demo
             </DialogTitle>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="w-4 h-4" />

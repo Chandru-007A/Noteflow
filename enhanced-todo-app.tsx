@@ -32,6 +32,7 @@ import {
   CheckCircle2,
   Cloud,
   Edit3,
+  Eye,
   FileText,
   Grid2X2,
   List,
@@ -94,6 +95,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [editing, setEditing] = useState<ClientNote | null>(null)
+  const [viewingNote, setViewingNote] = useState<ClientNote | null>(null)
   const [noteToDelete, setNoteToDelete] = useState<ClientNote | null>(null)
   const [draft, setDraft] = useState({
     title: "",
@@ -271,6 +273,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Button
+              id="new-note-header-btn"
               onClick={openNew}
               disabled={isMutating || isLoading}
               className="hidden rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md sm:flex"
@@ -339,6 +342,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
               </div>
               <div className="flex items-center gap-2">
                 <Button
+                  id="refresh-notes-button"
                   variant="outline"
                   size="sm"
                   onClick={refreshNotes}
@@ -353,6 +357,7 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
                   Refresh
                 </Button>
                 <Button
+                  id="new-note-mobile-btn"
                   onClick={openNew}
                   disabled={isMutating || isLoading}
                   className="rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md sm:hidden"
@@ -421,10 +426,22 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
                         Connected to Supabase PostgreSQL with owner-isolated Row Level Security (RLS).
                       </p>
                     </div>
-                    <Badge variant="outline" className="border-emerald-500 text-emerald-600">
-                      <CheckCircle2 className="size-3.5 mr-1" />
-                      Connected
-                    </Badge>
+                    {authError || error ? (
+                      <Badge variant="outline" className="border-rose-500 text-rose-600 dark:border-rose-400 dark:text-rose-400">
+                        <AlertCircle className="size-3.5 mr-1" />
+                        Connection Error
+                      </Badge>
+                    ) : isLoading ? (
+                      <Badge variant="outline" className="border-amber-500 text-amber-600 dark:border-amber-400 dark:text-amber-400">
+                        <Loader2 className="size-3.5 mr-1 animate-spin" />
+                        Connecting...
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400">
+                        <CheckCircle2 className="size-3.5 mr-1" />
+                        Connected
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex items-center justify-between pt-2">
                     <div>
@@ -640,6 +657,10 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setViewingNote(note)}>
+                              <Eye data-icon="inline-start" />
+                              View full note
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => openEdit(note)}>
                               <Edit3 data-icon="inline-start" />
                               Edit note
@@ -678,7 +699,10 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </CardHeader>
-                      <CardContent className="pt-0">
+                      <CardContent
+                        className="pt-0 cursor-pointer"
+                        onClick={() => setViewingNote(note)}
+                      >
                         <p className="line-clamp-4 min-h-20 text-sm leading-6 text-slate-600 dark:text-slate-300">
                           {note.content || "No content yet."}
                         </p>
@@ -766,10 +790,11 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditorOpen(false)}>
+            <Button id="note-cancel-button" variant="outline" onClick={() => setEditorOpen(false)}>
               Cancel
             </Button>
             <Button
+              id="note-save-button"
               onClick={saveNote}
               disabled={isMutating}
               className="bg-gradient-to-r from-violet-500 to-purple-600 text-white"
@@ -795,8 +820,9 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel id="cancel-delete-action-btn">Cancel</AlertDialogCancel>
             <AlertDialogAction
+              id="confirm-delete-action-btn"
               onClick={handleConfirmPermanentDelete}
               disabled={isMutating}
               className="bg-rose-600 hover:bg-rose-700 text-white"
@@ -807,6 +833,55 @@ export default function EnhancedTodoApp({ onBackToLanding }: { onBackToLanding?:
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Full Note View Modal */}
+      <Dialog open={Boolean(viewingNote)} onOpenChange={(open) => !open && setViewingNote(null)}>
+        <DialogContent className="max-w-2xl rounded-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              {viewingNote?.pinned && <Pin className="size-4 text-violet-500 shrink-0" />}
+              {viewingNote?.favorite && <Star className="size-4 fill-amber-400 text-amber-400 shrink-0" />}
+              <DialogTitle className="text-xl font-bold truncate">{viewingNote?.title}</DialogTitle>
+            </div>
+            <DialogDescription className="flex items-center gap-4 text-xs text-slate-400 pt-1">
+              <span>Updated {viewingNote && formatDate(viewingNote.updatedAt)}</span>
+              <span>Created {viewingNote && formatDate(viewingNote.createdAt)}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto py-4">
+            {viewingNote?.tags && viewingNote.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {viewingNote.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-200">
+              {viewingNote?.content || "No content."}
+            </p>
+          </div>
+          <DialogFooter className="flex items-center justify-between sm:justify-between">
+            <Button variant="outline" onClick={() => setViewingNote(null)}>
+              Close
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (viewingNote) {
+                  const noteToEdit = viewingNote
+                  setViewingNote(null)
+                  openEdit(noteToEdit)
+                }
+              }}
+            >
+              <Edit3 className="size-4 mr-2" />
+              Edit Note
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

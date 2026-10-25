@@ -175,7 +175,7 @@ export async function DELETE(
       return apiError("DATABASE_ERROR", "Failed to delete note", 500)
     }
 
-    return apiSuccess({ success: true })
+    return new Response(null, { status: 204 })
   } catch (err) {
     console.error("[DELETE /api/notes/[id]] Unexpected error:", err)
     return apiError("INTERNAL_ERROR", "An unexpected error occurred", 500)

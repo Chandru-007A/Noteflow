@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 const LEGACY_STORAGE_KEY = "noteflow-notes"
 const MIGRATION_RECORD_KEY = "noteflow-legacy-migrated"
+const MIGRATED_KEYS_KEY = "noteflow-migrated-keys"
 
 interface LegacyNote {
   id?: string
@@ -31,7 +32,8 @@ export function useNotes() {
   const initializedRef = useRef(false)
 
   /**
-   * Performs safe, one-time migration of legacy localStorage notes if the server workspace is empty.
+   * Performs safe, idempotent, per-note migration of legacy localStorage notes
+   * if the server workspace is empty. Tracks progress per-note to prevent duplicates on retry.
    */
   const migrateLegacyNotesIfEligible = useCallback(async (currentServerNotes: ClientNote[]): Promise<ClientNote[]> => {
     if (typeof window === "undefined") return currentServerNotes
@@ -75,12 +77,38 @@ export function useNotes() {
       return currentServerNotes
     }
 
-    toast.info(`Importing ${validNotes.length} existing notes into your cloud workspace...`)
+    // Load already-migrated keys to prevent duplicates on retry
+    let migratedKeys: string[] = []
+    try {
+      const rawKeys = window.localStorage.getItem(MIGRATED_KEYS_KEY)
+      if (rawKeys) migratedKeys = JSON.parse(rawKeys)
+    } catch {
+      migratedKeys = []
+    }
+
+    const pendingNotes = validNotes.filter((legacy, idx) => {
+      const itemKey = legacy.id || `idx_${idx}_${legacy.title}`
+      return !migratedKeys.includes(itemKey)
+    })
+
+    if (pendingNotes.length === 0) {
+      window.localStorage.setItem(MIGRATION_RECORD_KEY, "true")
+      return currentServerNotes
+    }
+
+    toast.info(`Importing ${pendingNotes.length} existing notes into your cloud workspace...`)
 
     const importedNotes: ClientNote[] = []
     let failureCount = 0
 
-    for (const legacy of validNotes) {
+    for (let i = 0; i < validNotes.length; i++) {
+      const legacy = validNotes[i]
+      const itemKey = legacy.id || `idx_${i}_${legacy.title}`
+
+      if (migratedKeys.includes(itemKey)) {
+        continue
+      }
+
       try {
         const createPayload: CreateNoteInput = {
           title: legacy.title!.trim(),
@@ -100,6 +128,10 @@ export function useNotes() {
           created = await notesApi.trashNote(created.id)
         }
 
+        // Record successful migration of this specific note immediately
+        migratedKeys.push(itemKey)
+        window.localStorage.setItem(MIGRATED_KEYS_KEY, JSON.stringify(migratedKeys))
+
         importedNotes.push(created)
       } catch (importErr) {
         console.error("[Migration] Failed to import note:", legacy.title, importErr)
@@ -108,14 +140,12 @@ export function useNotes() {
     }
 
     if (failureCount === 0) {
-      // Mark migration as successful; retain localStorage as recovery copy
       window.localStorage.setItem(MIGRATION_RECORD_KEY, "true")
       toast.success(`Successfully migrated ${importedNotes.length} notes to your cloud workspace.`)
-      return importedNotes
+      return [...currentServerNotes, ...importedNotes]
     } else {
-      toast.error(`Migrated ${importedNotes.length} notes, but ${failureCount} failed. Local backup preserved.`)
-      // Do not set MIGRATION_RECORD_KEY to true so retry remains possible
-      return importedNotes
+      toast.error(`Migrated ${importedNotes.length} notes, but ${failureCount} failed. You can retry later.`)
+      return [...currentServerNotes, ...importedNotes]
     }
   }, [])
 
