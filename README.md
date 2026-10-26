@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-15.2.4-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 15" />
-  <img src="https://img.shields.io/badge/React-19.0.0-blue?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
+  <img src="https://img.shields.io/badge/Next.js-15.5.28-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 15" />
+  <img src="https://img.shields.io/badge/React-19.0.6-blue?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Supabase-PostgreSQL_%26_Auth-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
@@ -103,8 +103,8 @@ To capture and add additional UI states for documentation, save your screenshots
 
 | Technology | Role in NoteFlow | Implementation in Project |
 | :--- | :--- | :--- |
-| **Next.js 15.2.4** | Full-Stack Framework | App Router, Server Components, Route Handlers (`/api/notes`), Edge Middleware |
-| **React 19.0.0** | UI Library | Component composition, hooks, concurrent rendering |
+| **Next.js 15.5.28** | Full-Stack Framework | App Router, Server Components, Route Handlers (`/api/notes`), Edge Middleware |
+| **React 19.0.6** | UI Library | Component composition, hooks, concurrent rendering |
 | **TypeScript 5** | Language | End-to-end static typing across database rows, API schemas, and client state |
 | **Tailwind CSS 3.4** | Styling | Utility-first responsive design, dark mode styling, custom animation tokens |
 | **shadcn/ui & Radix UI** | UI Primitives | Accessible `Dialog`, `AlertDialog`, `DropdownMenu`, `Select`, `Card`, `Badge` |
